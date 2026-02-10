@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+.minion-sessions.json
+.minion-channel-sessions.json
+.claude-minion/
+*.log
+logs/
+projects/
