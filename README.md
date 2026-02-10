@@ -1,8 +1,8 @@
-# Control Claude on Discord
+# Control Claude Code on Discord
 
 > Run Claude Code on remote servers and interact via Discord channels.
 
-Run Claude Code on a remote server (like an HPC cluster) and control it entirely through Discord. No SSH terminal needed — just chat.
+Run [Claude Code](https://code.claude.com/docs/en/overview) sessions on a remote server (like an HPC cluster) and control it entirely through Discord. No SSH terminal needed — just chat.
 
 **How it works:** You create a category in Discord (e.g. "Claude"). Any channel you create under that category automatically gets its own Claude Code session running on your server. Type a message in the channel, and Claude Code executes it — reading files, running commands, editing code — all from Discord. When Claude needs permission to do something dangerous, it asks via emoji reactions (1️⃣ approve once, 2️⃣ approve for session, 3️⃣ deny). Conversations persist across bot restarts, so you can pick up where you left off.
 
