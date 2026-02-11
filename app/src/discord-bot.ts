@@ -76,6 +76,9 @@ export class DiscordBot {
   // Pending interactive prompts (messageId -> prompt info)
   private pendingPrompts: Map<string, PendingPrompt> = new Map();
 
+  // Typing indicator intervals per channel
+  private typingIntervals: Map<string, NodeJS.Timeout> = new Map();
+
   constructor(
     botToken: string,
     workingDirectory: string,
@@ -426,6 +429,9 @@ export class DiscordBot {
     // Get user's OAuth token
     const userToken = this.sessionManager.getOAuthTokenForUser(userId);
 
+    // Start typing indicator while Claude processes
+    this.startTypingIndicator(channelId);
+
     // Send to terminal
     let success = await this.terminalManager.sendInput(channelSession.terminalId, messageWithFiles, userToken?.token);
     if (!success) {
@@ -438,6 +444,7 @@ export class DiscordBot {
         success = await this.terminalManager.sendInput(newSession.terminalId, messageWithFiles, userToken?.token);
       }
       if (!success) {
+        this.stopTypingIndicator(channelId);
         await message.reply(`Failed to send message to Claude Code.`);
       }
     }
@@ -630,7 +637,38 @@ export class DiscordBot {
     }
   }
 
+  private startTypingIndicator(channelId: string): void {
+    // Don't start if already typing
+    if (this.typingIntervals.has(channelId)) return;
+
+    const sendTyping = async () => {
+      try {
+        const channel = await this.client.channels.fetch(channelId);
+        if (channel && channel.isTextBased() && 'sendTyping' in channel) {
+          await (channel as TextChannel).sendTyping();
+        }
+      } catch (error) {
+        // Silently ignore - channel might be unavailable
+      }
+    };
+
+    // Send immediately, then every 8 seconds (typing indicator lasts ~10s)
+    sendTyping();
+    const interval = setInterval(sendTyping, 8000);
+    this.typingIntervals.set(channelId, interval);
+  }
+
+  private stopTypingIndicator(channelId: string): void {
+    const interval = this.typingIntervals.get(channelId);
+    if (interval) {
+      clearInterval(interval);
+      this.typingIntervals.delete(channelId);
+    }
+  }
+
   async handleAgentTurnComplete(channelId: string): Promise<void> {
+    // Stop typing indicator when Claude finishes
+    this.stopTypingIndicator(channelId);
     // Check if there's a result text that wasn't sent via MCP
     const resultText = this.terminalManager.getLatestResultText(channelId);
     if (resultText) {
