@@ -210,7 +210,7 @@ claude setup-token      # Regenerate token if needed
 
 ## Credits
 
-- Original Slack version: [tonychenxyz/claude-code-minion-public](https://github.com/tonychenxyz/claude-code-minion-public)
+- Slack version [by Tony](https://github.com/tonychenxyz/claude-code-minion-public)
 
 ## License
 
