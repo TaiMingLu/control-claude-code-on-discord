@@ -24,96 +24,80 @@ Run [Claude Code](https://code.claude.com/docs/en/overview) sessions on a remote
 - **Claude Code CLI** (`npm install -g @anthropic-ai/claude-code`)
 - **Discord bot** with Message Content Intent enabled
 
-## Quick Start
+## Setup
 
-### 1. Create a Discord Bot
+### Step 1: Create a Discord Bot
 
 1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
 2. Click **New Application** → name it (e.g., "Claude Code")
 3. Go to **Bot** → enable these **Privileged Gateway Intents**:
    - ✅ Message Content Intent
    - ✅ Server Members Intent
-4. Copy the **Bot Token**
+4. Copy the **Bot Token** — you'll need it in Step 4
 
-### 2. Invite the Bot to Your Server
+### Step 2: Invite the Bot to Your Server
 
 1. Go to **OAuth2** → **URL Generator**
 2. Select scopes: `bot`, `applications.commands`
 3. Select permissions: `Send Messages`, `Read Message History`, `Attach Files`, `Add Reactions`, `Use Slash Commands`
 4. Open the generated URL to invite the bot
 
-### 3. Create a Category
+### Step 3: Create a Category in Discord
 
-In your Discord server, create a category (e.g., "Claude"). Any channel created under this category will automatically get a Claude Code session.
+In your Discord server, create a category (e.g., "Claude"). Any channel you create under this category will automatically get its own Claude Code session.
 
-### 4. Install and Configure
+### Step 4: Install on Your Server
+
+SSH into the machine where you want Claude Code to run (your cluster, remote server, or local machine):
 
 ```bash
+ssh your-server  # skip if running locally
+
+# Clone the repo
 git clone https://github.com/TaiMingLu/control-claude-code-on-discord.git
 cd control-claude-code-on-discord
-
-# Copy the example env file and fill in your tokens
-cp .env.example .env
-nano .env
-
-# Install dependencies and build
-cd app
-npm install
-npm run build:main
-```
-
-### 5. Start the Bot
-
-```bash
-# From the app/ directory
-npm start
-```
-
-### 6. Connect via Discord
-
-1. The bot prints a **session token** on startup
-2. **DM the bot** with the token to authenticate
-3. Create a channel under your configured category
-4. Start chatting!
-
-## Cluster Deployment
-
-Running on an HPC cluster or remote server:
-
-```bash
-# SSH to your server
-ssh your-server
-
-# Clone and set up
-git clone https://github.com/TaiMingLu/control-claude-code-on-discord.git
-cd control-claude-code-on-discord
-
-# Configure
-cp .env.example .env
-nano .env
-# Fill in DISCORD_BOT_TOKEN, CLAUDE_CODE_OAUTH_TOKEN, WORKING_DIRECTORY
-# Use a random high port to avoid conflicts on shared clusters:
-#   ORCHESTRATOR_PORT=31415
 
 # Get a Claude Code OAuth token (headless, no browser needed)
 claude setup-token
-# Copy the token into .env
+# This prints a token like sk-ant-oat01-...
 
-# Install and build
+# Configure environment
+cp .env.example .env
+nano .env
+```
+
+Fill in your `.env`:
+```env
+DISCORD_BOT_TOKEN=your-bot-token-from-step-1
+CLAUDE_CODE_OAUTH_TOKEN=sk-ant-oat01-your-token-from-above
+CATEGORY_NAME=Claude
+WORKING_DIRECTORY=/path/to/your/workspace
+```
+
+> **On shared clusters:** Set `ORCHESTRATOR_PORT` to a random high port (10000–65535) to avoid collisions with other users.
+
+### Step 5: Build and Start
+
+```bash
 cd app
 npm install
 npm run build:main
 
-# Run in tmux for persistence
+# Recommended: run in tmux so it survives SSH disconnects
 tmux new -s claude-bot
 npm start
-# Detach: Ctrl+B, D
-
-# Reattach later
-tmux attach -t claude-bot
+# Detach with: Ctrl+B, then D
+# Reattach later: tmux attach -t claude-bot
 ```
 
-**Tip:** On shared clusters, use a random high port (10000–65535) for `ORCHESTRATOR_PORT` to avoid collisions with other users.
+### Step 6: Connect via Discord
+
+1. The bot prints a **session token** on startup (e.g., `F6690D7A`)
+2. **DM the bot** with the token to link your Discord account
+3. Create a channel under your category (from Step 3)
+4. Start chatting — Claude Code is now running on your server!
+
+> **Note:** The session token only needs to be sent once. After that, your account stays linked across bot restarts.
 
 ## Configuration
 
