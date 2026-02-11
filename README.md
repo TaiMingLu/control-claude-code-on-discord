@@ -76,14 +76,16 @@ WORKING_DIRECTORY=/path/to/your/workspace
 
 > **On shared clusters:** Set `ORCHESTRATOR_PORT` to a random high port (10000–65535) to avoid collisions with other users.
 
-### Step 5: Build and Start
+### Step 5: Build and Start (on your server)
+
+Still on the same server you SSH'd into in Step 4:
 
 ```bash
 cd app
 npm install
 npm run build:main
 
-# Recommended: run in tmux so it survives SSH disconnects
+# Run in tmux so the bot keeps running after you disconnect from SSH
 tmux new -s claude-bot
 npm start
 # Detach with: Ctrl+B, then D
