@@ -49,22 +49,23 @@ In your Discord server, create a category (e.g., "Claude"). Any channel created 
 ### 4. Install and Configure
 
 ```bash
-git clone https://github.com/your-username/control-claude-on-discord.git
-cd control-claude-on-discord/app
+git clone https://github.com/TaiMingLu/control-claude-code-on-discord.git
+cd control-claude-code-on-discord
+
+# Copy the example env file and fill in your tokens
+cp .env.example .env
+nano .env
+
+# Install dependencies and build
+cd app
 npm install
-npm run build
-```
-
-Copy the example environment file and fill in your tokens:
-
-```bash
-cp .env.example ../.env
-nano ../.env
+npm run build:main
 ```
 
 ### 5. Start the Bot
 
 ```bash
+# From the app/ directory
 npm start
 ```
 
@@ -83,17 +84,25 @@ Running on an HPC cluster or remote server:
 # SSH to your server
 ssh your-server
 
-# Setup
-git clone https://github.com/your-username/control-claude-on-discord.git
-cd control-claude-on-discord/app
-./setup.sh
+# Clone and set up
+git clone https://github.com/TaiMingLu/control-claude-code-on-discord.git
+cd control-claude-code-on-discord
 
-# Get a Claude Code OAuth token (headless)
+# Configure
+cp .env.example .env
+nano .env
+# Fill in DISCORD_BOT_TOKEN, CLAUDE_CODE_OAUTH_TOKEN, WORKING_DIRECTORY
+# Use a random high port to avoid conflicts on shared clusters:
+#   ORCHESTRATOR_PORT=31415
+
+# Get a Claude Code OAuth token (headless, no browser needed)
 claude setup-token
-# Copy the token into ../.env
+# Copy the token into .env
 
-# Use a random high port to avoid conflicts on shared clusters
-# Edit ../.env: ORCHESTRATOR_PORT=31415
+# Install and build
+cd app
+npm install
+npm run build:main
 
 # Run in tmux for persistence
 tmux new -s claude-bot
@@ -108,7 +117,7 @@ tmux attach -t claude-bot
 
 ## Configuration
 
-All options go in `.env` (in the repo root):
+All options go in `.env` at the repo root (copy from `.env.example`):
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
